@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 15:35:57 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/11 16:49:27 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/12 11:33:31 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int		main(int argc, char **argv)
 		{
 			while (get_next_line(fd, &buf_ptr) == 1)
 			{
-				ft_putstr(buf_ptr);
+				ft_putendl(buf_ptr);
 			}
 			close(fd);
 		}

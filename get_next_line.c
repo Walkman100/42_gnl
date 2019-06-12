@@ -6,26 +6,39 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/11 16:36:18 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/12 11:34:21 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include "../libft/libft.h"
 
 int		get_next_line(const int fd, char **line)
 {
 	int			ret;
-	static char	buf[BUF_SIZE];
-	//static int	cur_pos;
+	char		*tmp;
+	static char	buf[BUF_SIZE + 1];
+	static int	cur_pos = 0;
+	int			len;
 
-	if ((ret = read(fd, buf, BUF_SIZE)))
+	if (buf[cur_pos] == '\0')
 	{
+		cur_pos = 0;
+		ret = read(fd, buf, BUF_SIZE);
 		buf[ret] = '\0';
-		*line = buf;
-		return (1);
+		if (errno)
+			return (-1);
+		if (ret == 0)
+			return (0);
 	}
-	if (errno)
-		return (-1);
-	else
-		return (0);
+	len = ft_strclen(buf + cur_pos, '\n');
+	tmp = ft_strnew(len);
+	ft_strncpy(tmp, buf + cur_pos, len);
+	tmp[len] = '\0';
+	*line = tmp;
+
+	cur_pos = cur_pos + len;
+	if (buf[cur_pos] == '\n')
+		cur_pos++;
+	return (1);
 }
