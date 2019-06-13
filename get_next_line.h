@@ -15,7 +15,7 @@
 # include <unistd.h>
 # include <errno.h>
 # include "libft/libft.h"
-# define BUF_SIZE 32
+# define BUFF_SIZE 32
 
 int		get_next_line(const int fd, char **line);
 #endif
