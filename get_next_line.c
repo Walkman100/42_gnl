@@ -6,72 +6,97 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/13 15:54:12 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/16 18:51:30 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int	get_new_buffer(const int fd, char *buf, int *cur_pos)
+static int	get_new_buffer(const int fd, char *buf)
 {
 	int	ret;
 
-	*cur_pos = 0;
+	errno = 0;
 	ret = read(fd, buf, BUFF_SIZE);
 	buf[ret] = '\0';
-	if (errno)
-		return (-1);
 	if (ret == 0)
 		return (0);
+	else if (errno)
+		return (-1);
 	return (1);
 }
 
-static void	set_line(char **tmp, char *buf, int *cur_pos, char ***line)
+static void	shift_buffer(char *buf, int chars)
 {
-	int	len;
+	int	i;
 
-	len = ft_strclen(buf + *cur_pos, '\n');
-	if (*tmp)
+	if (ft_strchr(buf, '\n'))
 	{
-		*tmp = ft_strnew(ft_strlen(**line) + len);
-		ft_strcpy(*tmp, **line);
-		free(**line);
-		ft_strncat(*tmp, buf + *cur_pos, len);
+		i = 0;
+		while (i + chars < BUFF_SIZE)
+		{
+			buf[i] = buf[i + chars + 1];
+			i++;
+		}
 	}
 	else
-	{
-		*tmp = ft_strnew(len);
-		ft_strncpy(*tmp, buf + *cur_pos, len);
-		(*tmp)[len] = '\0';
-	}
-	**line = *tmp;
-	*cur_pos = *cur_pos + len;
+		buf[0] = '\0';
 }
+
+static char	*read_line(char *buf)
+{
+	int		len;
+	char	*tmp;
+
+	len = ft_strclen(buf, '\n');
+	tmp = ft_strnew(len);
+	ft_strncpy(tmp, buf, len);
+	tmp[len] = '\0';
+	shift_buffer(buf, len);
+	return (tmp);
+}
+
+static char	*concat_line(char *buf, char *old_line)
+{
+	int		len;
+	char	*tmp;
+
+	len = ft_strclen(buf, '\n');
+	tmp = ft_strnew(ft_strlen(old_line) + len);
+	ft_strcpy(tmp, old_line);
+	free(old_line);
+	ft_strncat(tmp, buf, len);
+	shift_buffer(buf, len);
+	return (tmp);
+}
+
+/*
+** int get_new_buffer(fd, buf) sets buffer and returns exit code
+** shift_buffer(buf) moves the buffer up for next line read
+** int read_line(buf) returns malloced string
+** int concat_line(buf, old_line) returns malloced string, frees original
+** buf[BUFF_SIZE + 1] = flag whether file has finished reading
+*/
 
 int			get_next_line(const int fd, char **line)
 {
 	int			ret;
-	char		*tmp;
-	static char	buf[BUFF_SIZE + 1];
-	static int	cur_pos = 0;
+	static char	buf[BUFF_SIZE + 2];
 
-	tmp = NULL;
-	while (buf[cur_pos] != '\n')
+	if (buf[BUFF_SIZE + 1] == 1)
+		return (0);
+	if (*buf == '\0')
+		if ((ret = get_new_buffer(fd, buf)) != 1)
+			return (ret);
+	*line = read_line(buf);
+	while (*buf == '\0' && buf[BUFF_SIZE + 1] != 1)
 	{
-		if (buf[cur_pos] == '\0')
-		{
-			if ((ret = get_new_buffer(fd, buf, &cur_pos)) != 1)
-				return (ret);
-		}
-		else
-			tmp = NULL;
-		set_line(&tmp, buf, &cur_pos, &line);
-	}
-	if (buf[cur_pos] == '\n')
-	{
-		cur_pos++;
-		if (tmp == NULL)
-			*line = ft_strnew(1);
+		ret = get_new_buffer(fd, buf);
+		if (ret == -1)
+			return (ret);
+		else if (ret == 0)
+			buf[BUFF_SIZE + 1] = 1;
+		*line = concat_line(buf, *line);
 	}
 	return (1);
 }
