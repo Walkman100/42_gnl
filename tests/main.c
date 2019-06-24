@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 15:35:57 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/13 13:03:50 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/14 17:29:38 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../get_next_line.h"
 #include <fcntl.h>
 
-void	print_file(char *filepath)
+void	print_file(STR filepath)
 {
 	int		fd;
 	char	*buf_ptr;
@@ -36,7 +36,7 @@ void	print_file(char *filepath)
 	}
 }
 
-int		main(int argc, char **argv)
+int		main(int argc, STR *argv)
 {
 	int		i;
 

@@ -12,7 +12,7 @@
 
 #include "get_next_line.h"
 
-static int	get_new_buffer(const int fd, char *buf)
+static int	get_new_buffer(const int fd, STR buf)
 {
 	int	ret;
 
@@ -26,7 +26,7 @@ static int	get_new_buffer(const int fd, char *buf)
 	return (1);
 }
 
-static void	shift_buffer(char *buf, int chars)
+static void	shift_buffer(STR buf, int chars)
 {
 	int	i;
 
@@ -43,7 +43,7 @@ static void	shift_buffer(char *buf, int chars)
 		buf[0] = '\0';
 }
 
-static char	*read_line(char *buf)
+static STR read_line(STR buf)
 {
 	int		len;
 	char	*tmp;
@@ -56,7 +56,7 @@ static char	*read_line(char *buf)
 	return (tmp);
 }
 
-static char	*concat_line(char *buf, char *old_line)
+static char	*concat_line(STR buf, STR old_line)
 {
 	int		len;
 	char	*tmp;
@@ -72,13 +72,13 @@ static char	*concat_line(char *buf, char *old_line)
 
 /*
 ** int get_new_buffer(fd, buf) sets buffer and returns exit code
-** shift_buffer(buf) moves the buffer up for next line read
-** int read_line(buf) returns malloced string
-** int concat_line(buf, old_line) returns malloced string, frees original
+** shift_buffer(buf, chars) moves the buffer up `chars` amount for next line read
+** str read_line(buf) returns malloced string
+** str concat_line(buf, old_line) returns malloced string, frees original
 ** buf[BUFF_SIZE + 1] = flag whether file has finished reading
 */
 
-int			get_next_line(const int fd, char **line)
+int			get_next_line(const int fd, STR *line)
 {
 	int			ret;
 	static char	buf[BUFF_SIZE + 2];
