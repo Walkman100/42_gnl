@@ -45,8 +45,8 @@ static void	shift_buffer(STR buf, int chars)
 
 static STR read_line(STR buf)
 {
-	int		len;
-	char	*tmp;
+	int	len;
+	STR	tmp;
 
 	len = ft_strclen(buf, '\n');
 	tmp = ft_strnew(len);
@@ -56,10 +56,10 @@ static STR read_line(STR buf)
 	return (tmp);
 }
 
-static char	*concat_line(STR buf, STR old_line)
+static STR	concat_line(STR buf, STR old_line)
 {
-	int		len;
-	char	*tmp;
+	int	len;
+	STR	tmp;
 
 	len = ft_strclen(buf, '\n');
 	tmp = ft_strnew(ft_strlen(old_line) + len);
@@ -72,7 +72,7 @@ static char	*concat_line(STR buf, STR old_line)
 
 /*
 ** int get_new_buffer(fd, buf) sets buffer and returns exit code
-** shift_buffer(buf, chars) moves the buffer up `chars` amount for next line read
+** shift_buffer(buf, chars) moves the buffer up `chars` amount to remove from the beginning
 ** str read_line(buf) returns malloced string
 ** str concat_line(buf, old_line) returns malloced string, frees original
 ** buf[BUFF_SIZE + 1] = flag whether file has finished reading

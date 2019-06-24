@@ -8,7 +8,11 @@ die() {
 
 cd "$(dirname "$0")"
 
-make -C ../libft || die "Make Libft"
+if [[ "$1" == "re" ]]; then
+    make -C ../libft re || die "Make Libft"
+else
+    make -C ../libft || die "Make Libft"
+fi
 
 echo gcc -Wall -Wextra -Werror -c ../get_next_line.c
 gcc -Wall -Wextra -Werror -c ../get_next_line.c || die "Compiling GetNextLine"

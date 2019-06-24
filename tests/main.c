@@ -6,11 +6,11 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 15:35:57 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/14 17:29:38 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/21 20:35:37 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../libft/libft.h"
+#include "../libft/libft.h"
 #include "../get_next_line.h"
 #include <fcntl.h>
 
