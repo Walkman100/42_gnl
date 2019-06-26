@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/16 18:51:30 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/26 13:52:22 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,16 @@ static void	shift_buffer(STR buf, int chars)
 		i = 0;
 		while (i + chars < BUFF_SIZE)
 		{
-			buf[i] = buf[i + chars + 1];
+			buf[i] = buf[i + chars];
 			i++;
 		}
+		buf[i] = '\0';
 	}
 	else
 		buf[0] = '\0';
 }
 
-static STR read_line(STR buf)
+static STR	read_line(STR buf)
 {
 	int	len;
 	STR	tmp;
@@ -72,7 +73,7 @@ static STR	concat_line(STR buf, STR old_line)
 
 /*
 ** int get_new_buffer(fd, buf) sets buffer and returns exit code
-** shift_buffer(buf, chars) moves the buffer up `chars` amount to remove from the beginning
+** shift_buffer(buf, chars) moves the buffer up `chars`
 ** str read_line(buf) returns malloced string
 ** str concat_line(buf, old_line) returns malloced string, frees original
 ** buf[BUFF_SIZE + 1] = flag whether file has finished reading
@@ -98,5 +99,7 @@ int			get_next_line(const int fd, STR *line)
 			buf[BUFF_SIZE + 1] = 1;
 		*line = concat_line(buf, *line);
 	}
+	if (*buf == '\n')
+		ft_memmove(buf, buf + 1, BUFF_SIZE);
 	return (1);
 }
