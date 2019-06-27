@@ -39,11 +39,16 @@ void	print_file(STR filepath)
 int		main(int argc, STR *argv)
 {
 	int		i;
+	char	*buf_ptr;
 
 	if (argc == 1)
 	{
-		ft_putendl_fd("File name missing.", 2);
-		return (1);
+		while (get_next_line(0, &buf_ptr) == 1)
+		{
+			ft_putstr(buf_ptr);
+			ft_putendl(BMAGENTA "$" RESET);
+		}
+		return (0);
 	}
 	i = 1;
 	while (i < argc)
