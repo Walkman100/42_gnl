@@ -6,11 +6,10 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 15:35:57 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/21 20:35:37 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/28 13:08:36 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft/libft.h"
 #include "../get_next_line.h"
 #include <fcntl.h>
 
@@ -46,6 +45,7 @@ int		main(int argc, STR *argv)
 		while (get_next_line(0, &buf_ptr) == 1)
 		{
 			ft_putstr(buf_ptr);
+			free(buf_ptr);
 			ft_putendl(BMAGENTA "$" RESET);
 		}
 		return (0);
