@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/26 13:52:22 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/06/28 13:24:59 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,13 @@ int			get_next_line(const int fd, STR *line)
 	int			ret;
 	static char	buf[BUFF_SIZE + 2];
 
+	if (fd == 1 || fd == 2)
+		return (-1);
 	if (buf[BUFF_SIZE + 1] == 1)
+	{
+		buf[BUFF_SIZE + 1] = 0;
 		return (0);
+	}
 	if (*buf == '\0')
 		if ((ret = get_new_buffer(fd, buf)) != 1)
 			return (ret);
