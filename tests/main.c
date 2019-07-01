@@ -29,6 +29,7 @@ void	print_file(STR filepath)
 		while (get_next_line(fd, &buf_ptr) == 1)
 		{
 			ft_putstr(buf_ptr);
+			free(buf_ptr);
 			ft_putendl(BMAGENTA "$" RESET);
 		}
 		close(fd);
