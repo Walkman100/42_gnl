@@ -26,7 +26,7 @@ clean:
 
 re: clean all
 
-$(GNL): ../get_next_line.c
+$(GNL): ../get_next_line.c ../get_next_line.h
 	gcc $(GCCFLAGS) -c ../get_next_line.c
 
 $(LFTA):
