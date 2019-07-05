@@ -6,7 +6,7 @@
 #    By: mcarter <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/28 15:49:40 by mcarter           #+#    #+#              #
-#    Updated: 2019/06/28 16:04:59 by mcarter          ###   ########.fr        #
+#    Updated: 2019/07/03 13:47:53 by mcarter          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,9 +22,11 @@ all: test
 
 clean:
 	rm -f $(GNL) test
+
+fclean: clean
 	make -C ../libft fclean
 
-re: clean all
+re: fclean all
 
 $(GNL): ../get_next_line.c ../get_next_line.h
 	gcc $(GCCFLAGS) -c ../get_next_line.c
