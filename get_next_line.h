@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:52 by mcarter           #+#    #+#             */
-/*   Updated: 2019/07/05 14:24:43 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/07/05 16:26:00 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,5 @@ typedef struct	s_flist
 	struct s_flist	*next;
 }				t_flist;
 
-int		get_next_line(const int fd, STR *line);
+int				get_next_line(const int fd, STR *line);
 #endif
