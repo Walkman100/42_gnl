@@ -6,20 +6,20 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/07/05 13:37:42 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/07/05 15:03:55 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int		get_new_buffer(t_finfo *finfo)
+static int		get_new_buffer(t_flist *flist)
 {
 	int	ret;
 
 	errno = 0;
-	finfo->pos = 0;
-	ret = read(finfo->fd, finfo->buff, BUFF_SIZE);
-	finfo->buff[ret] = '\0';
+	flist->pos = 0;
+	ret = read(flist->fd, flist->buff, BUFF_SIZE);
+	flist->buff[ret] = '\0';
 	if (ret == 0)
 		return (0);
 	else if (errno)
@@ -27,16 +27,16 @@ static int		get_new_buffer(t_finfo *finfo)
 	return (1);
 }
 
-static STR		get_line(t_finfo *finfo, STR old_line)
+static STR		get_line(t_flist *flist, STR old_line)
 {
 	int	len;
 	STR	tmp;
 
-	len = ft_strclen(finfo->buff + finfo->pos, '\n');
+	len = ft_strclen(flist->buff + flist->pos, '\n');
 	if (!old_line)
 	{
 		tmp = ft_strnew(len);
-		ft_strncpy(tmp, finfo->buff + finfo->pos, len);
+		ft_strncpy(tmp, flist->buff + flist->pos, len);
 		tmp[len] = '\0';
 	}
 	else
@@ -44,87 +44,79 @@ static STR		get_line(t_finfo *finfo, STR old_line)
 		tmp = ft_strnew(ft_strlen(old_line) + len);
 		ft_strcpy(tmp, old_line);
 		free(old_line);
-		ft_strncat(tmp, finfo->buff + finfo->pos, len);
+		ft_strncat(tmp, flist->buff + flist->pos, len);
 	}
-	finfo->pos += len;
+	flist->pos += len;
 	return (tmp);
 }
 
-static t_finfo	*get_finfo_fd(t_list **lst, int fd)
+static t_flist	*get_flist_fd(t_flist **lst, int fd)
 {
-	t_finfo	*finfo;
-	t_list	*lst_tmp;
-	t_list	*lst_prev;
+	t_flist	*lst_tmp;
+	t_flist	*lst_prev;
 
 	lst_tmp = *lst;
+	lst_prev = NULL;
 	while (lst_tmp)
 	{
-		if (((t_finfo *)(lst_tmp->content))->fd == fd)
-			return ((t_finfo *)lst_tmp->content);
+		if (lst_tmp->fd == fd)
+			return (lst_tmp);
 		lst_prev = lst_tmp;
 		lst_tmp = lst_tmp->next;
 	}
-	finfo = (t_finfo *)malloc(sizeof(t_finfo));
-	finfo->fd = fd;
-	finfo->buff = ft_strnew(BUFF_SIZE + 1);
-	finfo->pos = 0;
-	finfo->eof = 0;
+	lst_tmp = (t_flist *)malloc(sizeof(t_flist));
+	lst_tmp->fd = fd;
+	lst_tmp->buff = ft_strnew(BUFF_SIZE + 1);
+	lst_tmp->pos = 0;
+	lst_tmp->eof = 0;
+	lst_tmp->next = NULL;
 	if (lst_prev)
-		lst_prev->next = ft_lstnew(finfo, sizeof(t_finfo));
-	else
-		*lst = ft_lstnew(finfo, sizeof(t_finfo));
-	ft_memdel((void **)&finfo);
-	if (lst_prev)
-		return ((t_finfo *)lst_prev->next->content);
-	else
-		return ((t_finfo *)((*lst)->content));
-}
-
-static void		lstdelfnc(void *content, size_t size)
-{
-	ft_memdel((void **)&(((t_finfo *)content)->buff));
-	ft_memdel(&content);
-	size++;
+	{
+		lst_prev->next = lst_tmp;
+		return (lst_prev->next);
+	}
+	*lst = lst_tmp;
+	return (*lst);
 }
 
 /*
-** list.content (t_finfo) -> fd, buff, pos, eof
+** list.content (t_flist) -> fd, buff, pos, eof
 ** int     get_new_buffer(fd, buf) sets buffer and returns exit code
-** str     get_line(finfo) gets the line for the given fileinfo
-** t_finfo get_finfo_fd(lst_start, fd) gets the fileinfo for the given fd
-** lstdelfnc(void *, size_t) function to pass to ft_lstdelone
+** str     get_line(flist) gets the appropriate characters from the buffer
+** t_flist get_flist_fd(lst_start, fd) gets the filelist for the given fd
 **
 **gnl{ static lst_start; lst_cur }
 */
 
 int			get_next_line(const int fd, STR *line)
 {
-	static t_list	*lst;
-	t_list			*tmp;
-	t_list			*tmp_prev;
-	t_finfo			*finfo;
+	static t_flist	*lst;
+	t_flist			*tmp;
+	t_flist			*tmp_prev;
+	t_flist			*flist;
 	int				ret;
 
-	finfo = get_finfo_fd(&lst, fd);
+	flist = get_flist_fd(&lst, fd);
 	*line = NULL;
-	while (finfo->buff[finfo->pos] != '\n' && !finfo->eof)
+	while (flist->buff[flist->pos] != '\n' && !flist->eof)
 	{
-		if (finfo->buff[finfo->pos] == '\0' && (ret = get_new_buffer(finfo)) == 0)
-				finfo->eof = 1;
-		if (!finfo->eof)
-			*line = get_line(finfo, *line);
+		if (flist->buff[flist->pos] == '\0' && (ret = get_new_buffer(flist)) == 0)
+				flist->eof = 1;
+		if (!flist->eof)
+			*line = get_line(flist, *line);
 	}
-	finfo->pos++;
-	if (finfo->eof && !*line)
+	flist->pos++;
+	if (flist->eof && !*line)
 	{
 		tmp = lst;
-		while (((t_finfo *)(tmp->content))->fd != fd)
+		while (tmp->fd != fd)
 		{
 			tmp_prev = tmp;
 			tmp = tmp->next;
 		}
 		tmp_prev->next = tmp->next;
-		ft_lstdelone(&tmp, &lstdelfnc);
+		ft_strdel(&tmp->buff);
+		ft_memdel((void **)&tmp);
 		return (0);
 	}
 	if (!*line)
