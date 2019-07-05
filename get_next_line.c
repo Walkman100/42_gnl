@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/07/05 15:38:43 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/07/05 16:25:35 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,12 +96,14 @@ int			get_next_line(const int fd, STR *line)
 	t_flist			*flist;
 	int				ret;
 
+	if (fd == 1 || fd == 2 || read(fd, NULL, 0) < 0)
+		return (-1);
 	flist = get_flist_fd(&lst, fd);
 	*line = NULL;
 	while (flist->buff[flist->pos] != '\n' && !flist->eof)
 	{
 		if (flist->buff[flist->pos] == '\0' && (ret = get_new_buffer(flist)) == 0)
-				flist->eof = 1;
+			flist->eof = 1;
 		if (!flist->eof)
 			*line = get_line(flist, *line);
 	}
