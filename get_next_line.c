@@ -6,19 +6,20 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 13:59:47 by mcarter           #+#    #+#             */
-/*   Updated: 2019/07/05 12:29:16 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/07/05 13:37:42 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int		get_new_buffer(const int fd, STR buf)
+static int		get_new_buffer(t_finfo *finfo)
 {
 	int	ret;
 
 	errno = 0;
-	ret = read(fd, buf, BUFF_SIZE);
-	buf[ret] = '\0';
+	finfo->pos = 0;
+	ret = read(finfo->fd, finfo->buff, BUFF_SIZE);
+	finfo->buff[ret] = '\0';
 	if (ret == 0)
 		return (0);
 	else if (errno)
@@ -26,45 +27,27 @@ static int		get_new_buffer(const int fd, STR buf)
 	return (1);
 }
 
-static STR		get_line(t_finfo *finfo)
+static STR		get_line(t_finfo *finfo, STR old_line)
 {
 	int	len;
-	int	ret;
 	STR	tmp;
-	STR	tmpnew;
-	
-	ret = 1;
-	tmp = NULL;
-	while (finfo->buff[finfo->pos] != '\n' && !finfo->eof)
+
+	len = ft_strclen(finfo->buff + finfo->pos, '\n');
+	if (!old_line)
 	{
-		if (finfo->buff[finfo->pos] == '\0')
-		{
-			if ((ret = get_new_buffer(finfo->fd, finfo->buff)) == 0)
-			{
-				finfo->eof = 1;
-			}
-		}
-		len = ft_strclen(finfo->buff + finfo->pos, '\n');
-		if (!tmp)
-		{
-			tmp = ft_strnew(len);
-			ft_strncpy(tmp, finfo->buff + finfo->pos, len);
-			tmp[len] = '\0';
-		}
-		else
-		{
-			tmpnew = ft_strnew(ft_strlen(tmp) + len);
-			ft_strcpy(tmpnew, tmp);
-			free(tmp);
-			ft_strncat(tmpnew, finfo->buff + finfo->pos, len);
-		}
-		finfo->pos += len;
+		tmp = ft_strnew(len);
+		ft_strncpy(tmp, finfo->buff + finfo->pos, len);
+		tmp[len] = '\0';
 	}
-	finfo->pos++;
-	if (tmp)
-		return (tmp);
 	else
-		return (ft_strnew(0));
+	{
+		tmp = ft_strnew(ft_strlen(old_line) + len);
+		ft_strcpy(tmp, old_line);
+		free(old_line);
+		ft_strncat(tmp, finfo->buff + finfo->pos, len);
+	}
+	finfo->pos += len;
+	return (tmp);
 }
 
 static t_finfo	*get_finfo_fd(t_list **lst, int fd)
@@ -120,9 +103,19 @@ int			get_next_line(const int fd, STR *line)
 	t_list			*tmp;
 	t_list			*tmp_prev;
 	t_finfo			*finfo;
-	
+	int				ret;
+
 	finfo = get_finfo_fd(&lst, fd);
-	if (finfo->eof)
+	*line = NULL;
+	while (finfo->buff[finfo->pos] != '\n' && !finfo->eof)
+	{
+		if (finfo->buff[finfo->pos] == '\0' && (ret = get_new_buffer(finfo)) == 0)
+				finfo->eof = 1;
+		if (!finfo->eof)
+			*line = get_line(finfo, *line);
+	}
+	finfo->pos++;
+	if (finfo->eof && !*line)
 	{
 		tmp = lst;
 		while (((t_finfo *)(tmp->content))->fd != fd)
@@ -134,6 +127,7 @@ int			get_next_line(const int fd, STR *line)
 		ft_lstdelone(&tmp, &lstdelfnc);
 		return (0);
 	}
-	*line = get_line(finfo);
+	if (!*line)
+		*line = ft_strnew(0);
 	return (1);
 }
