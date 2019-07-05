@@ -6,7 +6,7 @@
 /*   By: mcarter <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/11 15:35:57 by mcarter           #+#    #+#             */
-/*   Updated: 2019/06/28 13:08:36 by mcarter          ###   ########.fr       */
+/*   Updated: 2019/07/05 12:28:49 by mcarter          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,13 @@ void	print_file(STR filepath)
 	}
 	else
 	{
+		buf_ptr = NULL;
 		while (get_next_line(fd, &buf_ptr) == 1)
 		{
+			if (!buf_ptr)
+				ft_putstr("return line is NULL!!");
 			ft_putstr(buf_ptr);
-			free(buf_ptr);
+			ft_memdel((void **)&buf_ptr);
 			ft_putendl(BMAGENTA "$" RESET);
 		}
 		close(fd);
